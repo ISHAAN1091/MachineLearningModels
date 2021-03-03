@@ -1,3 +1,4 @@
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -91,7 +92,10 @@ def gradientDescent(X, Y, max_iters=100, alpha=0.1):
 
 
 # Getting the parameters for our training data
+start = time.time()
 theta, cost_function_values, theta_values = gradientDescent(X, Y)
+end = time.time()
+print('Time Taken is: ', end-start)
 print("Parameters: ")
 print(theta)
 print("Decrease in Cost function with each iteration of gradient descent: ")
