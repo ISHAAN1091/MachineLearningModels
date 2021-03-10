@@ -42,36 +42,17 @@ def getW(query_point, X, tau):
 # Creating a function to make predictions on our test data
 def predict(X, Y, query_point, tau):
     ones = np.ones((X.shape[0], 1))
-    X_ = np.hstack((ones, X))
+    X_ = np.mat(np.hstack((ones, X)))
     query_point = np.mat([1, query_point])
-    W = getW(query_point, X, tau)
+    W = getW(query_point, X_, tau)
+    Y_ = np.mat(Y)
     # Implementing closed form solution to get theta for this specific query point
-    theta = np.linalg.pinv(X_.T*(W*X_))*(X_.T*(W*Y))
+    theta = np.linalg.pinv(X_.T*(W*X_))*(X_.T*(W*Y_))
     pred = np.dot(query_point, theta)
     return theta, pred
 
 
-# Visualizing predictions and analyzing the effect of tau
-def plotPrediction(tau):
-    X_test = np.linspace(-2, 2, 20)
-    Y_test = []
-    for xq in X_test:
-        theta, pred = predict(X, Y, xq, tau)
-        Y_test.append(pred)
-    Y_test = np.array(Y_test)
-
-
-predictions = []
-for i in range(X.shape[0]):
-    theta, pred = predict(X, Y, X[i][0], 1.5)
-    predictions.append(pred[0][0])
-    print(type(X[i][0]))
-predictions = np.array(predictions)
-predictions = predictions.reshape((-1, 1))
-
 # Creating the function to compute the value of R2
-
-
 def r2Score(Y, h_theta_):
     # Here to find the sums instead of using a loop np.sum is recommended as it is faster
     numerator = np.sum((h_theta_-Y)**2)
@@ -81,7 +62,31 @@ def r2Score(Y, h_theta_):
     return score
 
 
-# Finding coefficient of determination for our model
-print('Coefficient of Determination: ')
-r2_score = r2Score(Y, predictions)
-print(r2_score)
+# Visualizing predictions and analyzing the effect of tau
+def plotPrediction(tau):
+    X_test = X
+    Y_test = []
+    for xq in X_test:
+        theta, pred = predict(X, Y, xq[0], tau)
+        Y_test.append(pred[0][0])
+    Y_test = np.array(Y_test)
+    Y_test = Y_test.reshape((-1, 1))
+
+    # Finding coefficient of determination for our model
+    print('Coefficient of Determination for tau= %.2f: ' % tau)
+    r2_score = r2Score(Y, Y_test)
+    print(r2_score)
+
+    # Plotting the lowess curve
+    plt.title("Tau/Bandwidth Param %.2f" % tau)
+    plt.scatter(X, Y)
+    plt.scatter(X_test, Y_test, color='red')
+    plt.show()
+
+
+# Plotting our lowess curve for various tau to see the effect of bandwidth
+taus = [0.1, 0.5, 1, 5, 10]
+for t in taus:
+    plotPrediction(t)
+# Note - We observe that for higher tau lowess reduces to linear regression
+# as is clearly visible in the last case
