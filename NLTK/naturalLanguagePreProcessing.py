@@ -5,6 +5,7 @@ from nltk.stem.snowball import SnowballStemmer, PorterStemmer
 from nltk.stem.lancaster import LancasterStemmer
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Corpus - A large collection of data
 # .categories displays the various categories on which data is present in the brown corpus
@@ -166,3 +167,20 @@ docs = [sent1[0], sent2[0]]
 vectorized_docs = cv.fit_transform(docs).toarray()
 print(vectorized_docs)
 print(cv.vocabulary_)
+
+
+# TF-IDF Normalisation
+sent1 = "this is good movie"
+sent2 = "this was good movie"
+sent3 = "this is not good movie"
+
+corpus = [sent1, sent2, sent3]
+
+tfidf = TfidfVectorizer()
+# We can fit and transform like in above case using fit_transform method
+vectorized_corpus = tfidf.fit_transform(corpus).toarray()
+print(vectorized_corpus)
+print(vectorized_corpus.shape)
+# To get the vocabulary and its mapping with the index associated with it use .vocabulary_ method
+print(tfidf.vocabulary_)
+print(len(tfidf.vocabulary_))
